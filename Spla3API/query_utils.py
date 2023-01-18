@@ -5,6 +5,9 @@ from login_utils import validate_tokens, generate_tokens
 
 
 class BasicElement:
+    '''
+    An element with a name string and an image url string.
+    '''
     def __init__(self, name=None, image=None):
         self.name = name
         self.image = image
@@ -56,6 +59,19 @@ class Gear:
         return f"あと{end_time.seconds // 3600}時間{(end_time.seconds % 3600) // 60}分 {self.brand.name} {self.info.name} {self.price} {self.main_power}　{self.slot}"
 
 
+class Player:
+    def __init__(self):
+        self.name = None
+        self.xpower = None
+        self.weapon = None
+        self.rank = None
+
+    def __str__(self):
+        return f"{self.rank:<3} {self.xpower:<6} {self.name} {self.weapon}"
+
+    def __repr__(self):
+        return self.__str__()
+
 
 self_path = os.path.dirname(__file__)
 config_path = os.path.join(self_path, "config.txt")
@@ -74,9 +90,11 @@ NSO_APP_VERSION = config_data["nso_app_version"]
 
 USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
 
-query_id = {
+QUERY_ID = {
     "StageScheduleQuery": "730cd98e84f1030d3e9ac86b6f1aae13",
-    "GesotownQuery": "a43dd44899a09013bcfd29b4b13314ff"
+    "GesotownQuery": "a43dd44899a09013bcfd29b4b13314ff",
+    "XRankingQuery": "d771444f2584d938db8d10055599011d",
+    "XRankingDetailQuery": "ec7174376203f9901713e116075c5ecd"
 }
 
 BATTLE_MODE = ("regular", "open", "challenge", "xmatch", "league", "fest")
@@ -111,7 +129,7 @@ def generate_graphql_request(request_item):
         '_gtoken': WEB_SERVICE_TOKEN
     }
 
-    request_hash = query_id[request_item]
+    request_hash = QUERY_ID[request_item]
 
     body = {
         'extensions': {
@@ -167,6 +185,9 @@ def get_stages(mode, repeat=3):
 
 
 def get_stage_index_string(mode):
+    '''
+    Returns strings as index when loading json data.
+    '''
     if mode == 'regular':
         return "regularSchedules", "regularMatchSetting"
     elif mode in ('open', 'challenge'):
@@ -313,18 +334,87 @@ def get_gear_helper(data, is_daily=False):
     return gear_list
 
 
+def get_current_season():
+    '''
+    A helper function for fetching current season ID.
+    2020 Chill Season: WFJhbmtpbmdTZWFzb24tcDoy
+    '''
+    if not validate_tokens():
+        generate_tokens()
+        load_tokens()
+
+    header, cookie, body = generate_graphql_request('XRankingQuery')
+    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    if response.status_code != 200:
+        raise Exception("Request Failed!")
+
+    content = json.loads(response.text)
+    current_season_id = content["data"]["xRanking"]["currentSeason"]["id"]
+    current_season_name = content["data"]["xRanking"]["currentSeason"]["name"]
+
+    return current_season_id
+
+
+def get_x_ranking_helper(data, num):
+    '''
+    A helper function for loading x-ranking data from json data.
+    '''
+    ranking = []
+    for i in range(min(len(data), num)):
+        player = Player()
+        player.name = data[i]["node"]["name"]
+        player.xpower = data[i]["node"]["xPower"]
+        player.weapon = data[i]["node"]["weapon"]["name"]
+        player.rank = data[i]["node"]["rank"]
+        ranking.append(player)
+    return ranking
+
+
+def get_x_ranking(rule="ALL", num=10):
+    '''
+    Fetches X-ranking top 25 players each rule.
+    '''
+    current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
+    header, cookie, body = generate_graphql_request('XRankingDetailQuery')
+    body["variables"]["id"] = current_season_id
+    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    if response.status_code != 200:
+        raise Exception("Request Failed!")
+    content = json.loads(response.text)["data"]["xRanking"]
+    rankings = {"area": get_x_ranking_helper(content["xRankingAr"]["edges"], num),
+                "tower": get_x_ranking_helper(content["xRankingLf"]["edges"], num),
+                "rainmaker": get_x_ranking_helper(content["xRankingGl"]["edges"], num),
+                "clam": get_x_ranking_helper(content["xRankingCl"]["edges"], num)}
+
+    if rule == "ALL":
+        return rankings
+    elif rule == "area":
+        return {"area": rankings["area"]}
+    elif rule == "tower":
+        return {"tower": rankings["tower"]}
+    elif rule == "rainmaker":
+        return {"rainmaker": rankings["rainmaker"]}
+    elif rule == "clam":
+        return {"clam": rankings["clam"]}
 
 
 # for test
 if __name__ == '__main__':
     battle_rules =  ["regular", "open", "challenge", "xmatch", "league"]
     rules = ["coop"]
-    for rule in battle_rules + rules:
-        lst = get_stages(rule)
-        for i in lst:
-            print(i)
+    # for rule in battle_rules + rules:
+    #     lst = get_stages(rule)
+    #     for i in lst:
+    #         print(i)
 
     lst2 = get_gesotown()
     for i in lst2:
         print(i)
+
+    rankings = get_x_ranking("area")
+    for key, values in rankings.items():
+        print(key)
+        for p in values:
+            print(p)
+
     sys.exit(0)
