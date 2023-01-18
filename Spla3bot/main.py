@@ -4,7 +4,7 @@ import utils
 import sys
 
 sys.path.append("../Spla3API")
-from query_utils import get_stages, get_gesotown
+from query_utils import get_stages, get_gesotown, get_x_ranking
 
 BOT_TOKEN = utils.load_token()
 
@@ -92,6 +92,16 @@ async def gear(ctx):
     for gear in gears:
         embed = discord.Embed(title=gear.info)
         embed = utils.gear_embed_format(embed, gear)
+        await ctx.send(embed=embed)
+
+
+@bot.command()
+async def xrank(ctx, rule="ALL", num=10):
+    rankings = get_x_ranking(rule, num)
+    for rule, ranking in rankings.items():
+        rule_dict = {"area":"ガチエリア", "tower":"ガチヤグラ", "rainmaker":"ガチホコバトル", "clam":"ガチアサリ"}
+        embed = discord.Embed(title=rule_dict[rule])
+        embed = utils.xranking_embed_format(embed, ranking)
         await ctx.send(embed=embed)
 
 
