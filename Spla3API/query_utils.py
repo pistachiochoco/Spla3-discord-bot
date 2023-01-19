@@ -94,7 +94,11 @@ QUERY_ID = {
     "StageScheduleQuery": "730cd98e84f1030d3e9ac86b6f1aae13",
     "GesotownQuery": "a43dd44899a09013bcfd29b4b13314ff",
     "XRankingQuery": "d771444f2584d938db8d10055599011d",
-    "XRankingDetailQuery": "ec7174376203f9901713e116075c5ecd"
+    "XRankingDetailQuery": "ec7174376203f9901713e116075c5ecd",
+    "DetailTabViewXRankingArRefetchQuery": "eb69df6f2a2f13ab207eedc568f0f8b6",
+    "DetailTabViewXRankingClRefetchQuery": "68f99b7b02537bcb881db07e4e67f8dd",
+    "DetailTabViewXRankingGlRefetchQuery": "5f8f333770ed3c43e21b0121f3a86716",
+    "DetailTabViewXRankingLfRefetchQuery": "4e8b381ae6f9620443627f4eac3a2210"
 }
 
 BATTLE_MODE = ("regular", "open", "challenge", "xmatch", "league", "fest")
@@ -374,6 +378,10 @@ def get_x_ranking(rule="ALL", num=10):
     '''
     Fetches X-ranking top 25 players each rule.
     '''
+    if not validate_tokens():
+        generate_tokens()
+        load_tokens()
+
     current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
     header, cookie, body = generate_graphql_request('XRankingDetailQuery')
     body["variables"]["id"] = current_season_id
@@ -398,6 +406,110 @@ def get_x_ranking(rule="ALL", num=10):
         return {"clam": rankings["clam"]}
 
 
+
+def get_x_ranking_borderline():
+    '''
+    Fetches X-ranking 500th player's X-power of each rule.
+    '''
+    # current_season_id = get_current_season()
+
+    if not validate_tokens():
+        generate_tokens()
+        load_tokens()
+
+    current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
+    body = {}
+    header, cookie, body["Ar"] = generate_graphql_request('DetailTabViewXRankingArRefetchQuery')
+    _, _, body["Lf"] = generate_graphql_request('DetailTabViewXRankingLfRefetchQuery')
+    _, _, body["Gl"] = generate_graphql_request('DetailTabViewXRankingGlRefetchQuery')
+    _, _, body["Cl"] = generate_graphql_request('DetailTabViewXRankingClRefetchQuery')
+    for b in body.values():
+        b["variables"]["id"] = current_season_id
+        b["variables"]["cursor"] = "NzU"
+        b["variables"]["page"] = 5
+        b["variables"]["first"] = 25
+
+    responses = {}
+    for key in body.keys():
+        responses[key] = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body[key])
+        if responses[key].status_code != 200:
+            raise Exception("Request Failed!")
+
+    borderlines = {}
+    for key in body.keys():
+        borderlines[key] = json.loads(responses[key].text)["data"]["node"][f"xRanking{key}"]["edges"][-1]["node"]["xPower"]
+
+    return borderlines
+
+
+
+def get_stages_by_rule(rule='Ar', mode='xmatch'):
+    '''
+    Returns stages by rule(Splat Zone / Tower control / Rainmaker / Clam blitz).
+    '''
+
+    if not validate_tokens():
+        generate_tokens()
+        load_tokens()
+
+    header, cookie, body = generate_graphql_request('StageScheduleQuery')
+    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    if response.status_code != 200:
+        raise Exception("Request Failed!")
+    mode_schedule, mode_setting = get_stage_index_string(mode)
+    content = json.loads(response.text)["data"][mode_schedule]["nodes"]
+    schedule_list = get_stages_by_rule_helper(content, rule, mode, mode_setting)
+    return schedule_list
+
+
+
+def get_stages_by_rule_helper(data, rule, mode, mode_setting):
+    '''
+    A helper function returns schedules of specific rule.
+    '''
+    schedule_list = []
+    rule_dict = {"Ar": "AREA", "Lf": "LOFT", "Gl": "GOAL", "Cl": "CLAM"}
+    if mode not in ('open', 'challenge'):
+        for node in data:
+            if rule_dict[rule] == node[mode_setting]["vsRule"]["rule"]:
+                schedule = Schedule()
+                schedule.mode = mode
+                schedule.start = datetime.datetime.strptime(node["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(node["endTime"], TIME_FORMAT) + UTC_TO_JST
+
+                schedule.rule = node[mode_setting]["vsRule"]["name"]
+
+                for j in range(2):
+                    stage_name = node[mode_setting]["vsStages"][j]["name"]
+                    stage_image = node[mode_setting]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
+
+                schedule_list.append(schedule)
+    elif mode in ('open', 'challenge'):
+        bankara_idx = {"challenge": 0, "open": 1}
+        for node in data:
+            if rule_dict[rule] == node[mode_setting][bankara_idx[mode]]["vsRule"]["rule"]:
+                schedule = Schedule()
+                schedule.mode = mode
+                schedule.start = datetime.datetime.strptime(node["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(node["endTime"], TIME_FORMAT) + UTC_TO_JST
+
+                schedule.rule = node[mode_setting][bankara_idx[mode]]["vsRule"]["name"]
+
+                for j in range(2):
+                    stage_name = node[mode_setting][bankara_idx[mode]]["vsStages"][j]["name"]
+                    stage_image = node[mode_setting][bankara_idx[mode]]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
+
+                schedule_list.append(schedule)
+
+    return schedule_list
+
+
+
+
 # for test
 if __name__ == '__main__':
     battle_rules =  ["regular", "open", "challenge", "xmatch", "league"]
@@ -407,14 +519,22 @@ if __name__ == '__main__':
     #     for i in lst:
     #         print(i)
 
-    lst2 = get_gesotown()
-    for i in lst2:
-        print(i)
+    # lst2 = get_gesotown()
+    # for i in lst2:
+    #     print(i)
 
-    rankings = get_x_ranking("area")
-    for key, values in rankings.items():
-        print(key)
-        for p in values:
-            print(p)
+    # rankings = get_x_ranking("area")
+    # for key, values in rankings.items():
+    #     print(key)
+    #     for p in values:
+    #         print(p)
+
+    # print(get_x_ranking_borderline())
+
+    lst3 = get_stages_by_rule("Lf")
+    lst4 = get_stages_by_rule("Gl", "challenge")
+    lst5 = get_stages_by_rule("Cl", "open")
+    for i in lst3 + lst4 + lst5:
+        print(i)
 
     sys.exit(0)

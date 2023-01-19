@@ -8,4 +8,4 @@
 4. ~~Add new function for inquiring X-ranking~~ only top25 for now
 5. Find a good way to insert stages'/weapons' image into message
 6. Find a way to make this bot running all the time
-7. ルール別ステージ返してほしい (/yaguraでいくつかのヤグラスケジュールを返す的な)
+7. ~~ルール別ステージ返してほしい (/yaguraでいくつかのヤグラスケジュールを返す的な)~~
