@@ -186,7 +186,6 @@ def get_stages(mode, repeat=3):
     return schedule_list
 
 
-
 def get_stage_index_string(mode):
     '''
     Returns strings as index when loading json data.
@@ -203,7 +202,6 @@ def get_stage_index_string(mode):
         return "festSchedules", "festMatchSetting"
     elif mode == 'coop':
         return "coopGroupingSchedule", "regularSchedules", "bigRunSchedules"
-
 
 
 def get_battle_stages_helper(mode, schedules, mode_setting, repeat):
@@ -252,7 +250,6 @@ def get_battle_stages_helper(mode, schedules, mode_setting, repeat):
             schedule_list.append(schedule)
 
     return schedule_list
-
 
 
 def get_coop_stages_helper(mode, schedules, repeat):
@@ -405,7 +402,6 @@ def get_x_ranking(rule="ALL", num=10):
         return {"clam": rankings["clam"]}
 
 
-
 def get_x_ranking_borderline():
     '''
     Fetches X-ranking 500th player's X-power of each rule.
@@ -441,7 +437,6 @@ def get_x_ranking_borderline():
     return borderlines
 
 
-
 def get_stages_by_rule(rule='Ar', mode='xmatch'):
     '''
     Returns stages by rule(Splat Zone / Tower control / Rainmaker / Clam blitz).
@@ -459,7 +454,6 @@ def get_stages_by_rule(rule='Ar', mode='xmatch'):
     content = json.loads(response.text)["data"][mode_schedule]["nodes"]
     schedule_list = get_stages_by_rule_helper(content, rule, mode, mode_setting)
     return schedule_list
-
 
 
 def get_stages_by_rule_helper(data, rule, mode, mode_setting):
@@ -508,32 +502,6 @@ def get_stages_by_rule_helper(data, rule, mode, mode_setting):
 
 
 
-
 # for test
 if __name__ == '__main__':
-    battle_rules =  ["regular", "open", "challenge", "xmatch", "league"]
-    rules = ["coop"]
-    # for rule in battle_rules + rules:
-    #     lst = get_stages(rule)
-    #     for i in lst:
-    #         print(i)
-
-    # lst2 = get_gesotown()
-    # for i in lst2:
-    #     print(i)
-
-    # rankings = get_x_ranking("area")
-    # for key, values in rankings.items():
-    #     print(key)
-    #     for p in values:
-    #         print(p)
-
-    # print(get_x_ranking_borderline())
-
-    lst3 = get_stages_by_rule("Lf")
-    lst4 = get_stages_by_rule("Gl", "challenge")
-    lst5 = get_stages_by_rule("Cl", "open")
-    for i in lst3 + lst4 + lst5:
-        print(i)
-
     sys.exit(0)

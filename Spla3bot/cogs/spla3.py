@@ -22,9 +22,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュール"):
         Query bankara match open schedules. Recent 3 schedules will be returned as default.
         """
         schedules = get_stages("open", num)
-        embed = discord.Embed(title="バンカラマッチ オープン")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format("open", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def regular(
@@ -36,9 +37,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュール"):
         Query regular match schedules. Recent 3 schedules will be returned as default.
         """
         schedules = get_stages("regular", num)
-        embed = discord.Embed(title="レギュラーマッチ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format("regular", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def challenge(
@@ -50,9 +52,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュール"):
         Query bankara match challenge schedules. Recent 3 schedules will be returned as default.
         """
         schedules = get_stages("challenge", num)
-        embed = discord.Embed(title="バンカラマッチ チャレンジ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format("challenge", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def xmatch(
@@ -64,9 +67,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュール"):
         Query X-match schedules. Recent 3 schedules will be returned as default.
         """
         schedules = get_stages("xmatch", num)
-        embed = discord.Embed(title="Xマッチ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format("xmatch", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def league(
@@ -78,9 +82,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュール"):
         Query league match schedules. Recent 3 schedules will be returned as default.
         """
         schedules = get_stages("league", num)
-        embed = discord.Embed(title="リーグマッチ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format("league", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class ScheduleByRule(commands.Cog, name="ルール別スケジュール"):
@@ -98,9 +103,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュール"):
         Query battle schedules of Splat Zones. Schedules of X-match will be returned by default.
         """
         schedules = get_stages_by_rule("Ar", mode)
-        embed = discord.Embed(title=f"{MODE_DICT[mode]}　ガチエリア")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format(mode, schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def yagura(
@@ -113,9 +119,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュール"):
         Query battle schedules of Tower Control. Schedules of X-match will be returned by default.
         """
         schedules = get_stages_by_rule("Lf", mode)
-        embed = discord.Embed(title=f"{MODE_DICT[mode]}　ガチヤグラ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format(mode, schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def hoko(
@@ -128,9 +135,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュール"):
         Query battle schedules of Rainmaker. Schedules of X-match will be returned by default.
         """
         schedules = get_stages_by_rule("Gl", mode)
-        embed = discord.Embed(title=f"{MODE_DICT[mode]}　ガチホコバトル")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format(mode, schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @commands.command()
     async def asari(
@@ -143,9 +151,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュール"):
         Query battle schedules of Clam Blitz. Schedules of X-match will be returned by default.
         """
         schedules = get_stages_by_rule("Cl", mode)
-        embed = discord.Embed(title=f"{MODE_DICT[mode]}　ガチアサリ")
-        embed = utils.stage_embed_format('battle', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.battle_stage_embed_format(mode, schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class SalmonScheduleByTime(commands.Cog, name="サーモンランのスケジュール"):
@@ -163,7 +172,7 @@ class SalmonScheduleByTime(commands.Cog, name="サーモンランのスケジュ
         """
         schedules = get_stages("coop", num)
         embed = discord.Embed(title="サーモンラン")
-        embed = utils.stage_embed_format('coop', embed, schedules)
+        embed = utils.coop_stage_embed_format('coop', embed, schedules)
         await ctx.send(embed=embed)
 
 

@@ -3,8 +3,6 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 sys.path.append("../Spla3API")
-from query_utils import get_stages, get_gesotown, get_x_ranking, get_x_ranking_borderline, get_stages_by_rule
-
 
 load_dotenv()
 
@@ -30,14 +28,13 @@ class Bot(commands.Bot):
         print('------')
 
     async def setup_hook(self):
-        for file in os.listdir(f"./cogs"):
-            extension = file[:-3]
-            try:
-                await bot.load_extension(f"cogs.{extension}")
-                print(f"Loaded extension {extension}")
-            except Exception as e:
-                exception = f"{type(e).__name__}: {e}"
-                print(f"Failed to load extension {extension}\n{exception}")
+        extension = "spla3"
+        try:
+            await bot.load_extension(f"cogs.{extension}")
+            print(f"Loaded extension {extension}")
+        except Exception as e:
+            exception = f"{type(e).__name__}: {e}"
+            print(f"Failed to load extension {extension}\n{exception}")
 
 
 bot = Bot()
