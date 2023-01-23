@@ -1,3 +1,7 @@
 .idea/
 venv/
 test.py
+
+/Spla3API/config.txt
+
+/Spla3bot/.env

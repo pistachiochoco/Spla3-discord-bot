@@ -180,8 +180,7 @@ def get_stages(mode, repeat=3):
         schedules = json.loads(response.text)["data"][mode_schedules][regular]["nodes"]
         if not schedules:
             json.loads(response.text)["data"][mode_schedules][bigrun]["nodes"]
-        # repeat = min(repeat, len(schedules))
-        repeat = 1
+        repeat = min(repeat, len(schedules))
         schedule_list = get_coop_stages_helper(mode, schedules, repeat)
 
     return schedule_list

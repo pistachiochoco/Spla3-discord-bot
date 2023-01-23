@@ -1,15 +1,16 @@
-import os, json
-self_path = os.path.dirname(__file__)
+RULE_DICT = {
+    "area": "ガチエリア", "Ar": "ガチエリア",
+    "tower": "ガチヤグラ", "Lf": "ガチヤグラ",
+    "rainmaker": "ガチホコバトル", "Gl": "ガチホコバトル",
+    "clam": "ガチアサリ", "Cl": "ガチアサリ"
+}
 
-def load_token():
-    config_path = os.path.join(self_path, 'config.txt')
-    config_file = open(config_path, "r")
-    config_data = json.load(config_file)
-    config_file.close()
-    token = config_data["token"]
-
-    return token
-
+MODE_DICT = {
+    "xmatch": "Xマッチ",
+    "open": "バンカラマッチ オープン",
+    "challenge": "バンカラマッチ チャレンジ",
+    "league": "リーグマッチ"
+}
 
 def stage_embed_format(mode, embed, schedules):
     if mode == 'battle':
@@ -21,7 +22,8 @@ def stage_embed_format(mode, embed, schedules):
 
     if mode == 'coop':
         for schedule in schedules:
-            embed.add_field(name="日時", value=schedule.start.strftime("%-m月%-d日 %-H:%Mから"), inline=False)
+            time_str = schedule.start.strftime("%-m月%-d日 %-H:%Mから") + schedule.end.strftime("%-m月%-d日 %-H:%Mまで")
+            embed.add_field(name="日時", value=time_str, inline=False)
             embed.add_field(name="ステージ", value=schedule.stage, inline=False)
             embed.add_field(name="ブキ", value=f"{schedule.weapons[0]}\n{schedule.weapons[1]}\n{schedule.weapons[2]}\n{schedule.weapons[3]}", inline=True)
             embed.set_image(url=schedule.stage.image)
