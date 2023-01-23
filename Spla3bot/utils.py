@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import requests
 import discord
+from PIL import Image
 
 RULE_DICT = {
     "area": "ガチエリア", "Ar": "ガチエリア",
@@ -29,13 +30,28 @@ COLOR_DICT = {
     "coop": "",
 }
 
+BACKGROUND_COLOR = (0, 0, 0, 255)
+
 
 def load_web_image(url):
     '''Fetches web image by GET request and returns it in opencv-format.'''
     response = requests.get(url, stream=True).raw
     image = np.asarray(bytearray(response.read()), dtype="uint8")
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    return image
+    image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
+
+    # opencv -> PIL
+    image_pil = cv2.cvtColor(image, cv2.COLOR_BGRA2RGBA)
+    image_pil = Image.fromarray(image_pil)
+
+    # add background color
+    background = Image.new("RGBA", image_pil.size, BACKGROUND_COLOR)
+    image_bg = Image.alpha_composite(background, image_pil)
+
+    # PIL -> opencv
+    image_cv = np.array(image_bg, dtype=np.uint8)
+    image_cv = cv2.cvtColor(image_cv, cv2.COLOR_RGBA2BGRA)
+
+    return image_cv
 
 
 def horizontal_concat_images(urls):
@@ -74,6 +90,21 @@ def concat_images_coop(weapon_urls, stage_url):
     stage_image = load_web_image(stage_url)
     coop_image = vertical_concat_images_coop(weapons_image, stage_image)
     return coop_image
+
+
+def concat_images_gear(power_urls, gear_url):
+    power_image = horizontal_concat_images(power_urls)
+
+    # gear power image size is 100x100
+    img_black = Image.new("RGBA", (100, 100), BACKGROUND_COLOR)
+    img_black = np.array(img_black, dtype=np.uint8)
+    img_black = cv2.cvtColor(img_black, cv2.COLOR_RGBA2BGRA)
+
+    for _ in range(4 - len(power_urls)):
+        power_image = cv2.hconcat([power_image, img_black])
+    gear_image = load_web_image(gear_url)
+    concat_image = vertical_concat_images_coop(power_image, gear_image)
+    return concat_image
 
 
 def embed_set_images_from_urls(urls, embed):
@@ -144,30 +175,20 @@ def coop_stage_embed_format_prev(mode, embed, schedules):
 
 
 def gear_embed_format(embed, gear):
-    embed.add_field(name="", value=f"あと{gear.left_time}", inline=True)
+    '''Generate one embed message for one gear.'''
+    embed.add_field(name="残り時間", value=f"あと{gear.left_time}", inline=True)
     embed.add_field(name="ブランド", value=gear.brand, inline=True)
     embed.add_field(name="値段", value=gear.price, inline=True)
     embed.add_field(name="ギアパワー", value=gear.main_power, inline=True)
     embed.add_field(name="スロット数", value=gear.slot, inline=True)
-    embed.set_image(url=gear.info.image)
-    return embed
+    gear_power_image_urls = [gear.main_power.image] + [gear.sub_power.image for _ in range(gear.slot)]
+    gear_image_url = gear.info.image
+    gear_image = concat_images_gear(gear_power_image_urls, gear_image_url)
+    embed, file = embed_set_image(gear_image, embed)
+    return embed, file
 
 
 def xranking_embed_format(embed, ranking):
     for player in ranking:
         embed.add_field(name="", value=player, inline=False)
     return embed
-
-
-# for test
-if __name__ == '__main__':
-    url = "https://api.lp1.av5ja.srv.nintendo.net/resources/prod/stage_img/icon/low_resolution/b9d8cfa186d197a27e075600a107c99d9e21646d116730f0843e0fff0aaba7dd_1.png?Expires=1704844800&Signature=J99BZxY~AvICrHtChQ~-CmSb1gH37zLLEqDv9UdjkoIQmFst---Cp3obRGUWehLN8wvOlj8kFAgB2LR1rVNcusnMfMCakk6yeOJL6KmcP9QN-0hF~YyhaEtU~wQMSu9UN-bcsN4gdo20v8zkdmb5UhG79puNXs4rOJTkhnA6MeF12NvIgUF4womnMs~0UmxASKIAsbhL3rt6pq8Sv0yPZSUGXxyaD3THXa-SfRK9FuPNyyuc1ZXuE6DZlgquJJAC80D7wIe8tR3uaaVz6KAYcW4xU9hE1-O-Stjr~GOg1MK-1Q2tOI1Y-ascdJEQmE5XI0vuYEvjFsuO8nlcRQ5o8A__&Key-Pair-Id=KNBS2THMRC385"
-    urls = [url, url]
-    url2 = "https://api.lp1.av5ja.srv.nintendo.net/resources/prod/weapon_illust/6e58a0747ab899badcb6f351512c6034e0a49bd6453281f32c7f550a2132fd65_0.png?Expires=1704844800&Signature=FQdjsM1EhI1-A0JWUuJt89QKi4zwT5HUfzb33gZkiFmnhCqCZnnaRU~odhPwZwiQx2mt9wdii5m-iXVXVmlhBvkNiYlkOfuqYa4N4-vqpnpUVfx3H3ZQUlmLsjL3L4kphgGPO7ts2UXGo3GQmW7jle85i7IYAORhzNmXxbjSFVBCnXUHkxYka0p4gZ-4CsbbupzzbfMN09~y1mSZQTCop0BCdXfiKbDq2c4z~DF7GppZ3VOlOxcBpXgTLywrkyVcKD2T8d96SWrBtxgUjLjhIVCgGOPwIWsYaARxrBvEx7RyreC18yFyh8zkSAlUjeUcQUQht8Do091Jupnf7GIXSw__&Key-Pair-Id=KNBS2THMRC385"
-    img = load_web_image(url2)
-    t = horizontal_concat_images(urls)
-    file_name = "image_concat.png"
-
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()

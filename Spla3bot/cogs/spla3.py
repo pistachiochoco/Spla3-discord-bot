@@ -172,7 +172,7 @@ class SalmonScheduleByTime(commands.Cog, name="サーモンランのスケジュ
         """
         schedules = get_stages("coop", num)
         for schedule in schedules:
-            embed, file = utils.coop_stage_embed_format2("coop", schedule)
+            embed, file = utils.coop_stage_embed_format("coop", schedule)
             await ctx.send(file=file, embed=embed)
         os.remove(f"./{file.filename}")
 
@@ -190,8 +190,9 @@ class Gear(commands.Cog, name="ゲソタウンのギア"):
         gears = get_gesotown()
         for gear in gears:
             embed = discord.Embed(title=gear.info)
-            embed = utils.gear_embed_format(embed, gear)
-            await ctx.send(embed=embed)
+            embed, file = utils.gear_embed_format(embed, gear)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class XRanking(commands.Cog, name="Xランキング関連"):

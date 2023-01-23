@@ -46,6 +46,7 @@ class Gear:
         self.info = BasicElement()
         self.brand = BasicElement()
         self.main_power = BasicElement()
+        self.sub_power = BasicElement()
         self.easy_power = BasicElement()
         self.slot = 0
         self.price = 0
@@ -322,6 +323,8 @@ def get_gear_helper(data, is_daily=False):
         gear.brand.image = gear_data["gear"]["brand"]["image"]["url"]
         gear.main_power.name = gear_data["gear"]["primaryGearPower"]["name"]
         gear.main_power.image = gear_data["gear"]["primaryGearPower"]["image"]["url"]
+        gear.sub_power.name = gear_data["gear"]["additionalGearPowers"][0]["name"]
+        gear.sub_power.image = gear_data["gear"]["additionalGearPowers"][0]["image"]["url"]
         gear.end = datetime.datetime.strptime(gear_data["saleEndTime"], TIME_FORMAT) + UTC_TO_JST
         gear.left_time = f"{(gear.end - datetime.datetime.now()).seconds // 3600}時間{((gear.end - datetime.datetime.now()).seconds % 3600) // 60}分"
         gear.price = gear_data["price"]
@@ -498,7 +501,6 @@ def get_stages_by_rule_helper(data, rule, mode, mode_setting):
                 schedule_list.append(schedule)
 
     return schedule_list
-
 
 
 # for test
