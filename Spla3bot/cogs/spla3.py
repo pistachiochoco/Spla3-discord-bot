@@ -171,9 +171,10 @@ class SalmonScheduleByTime(commands.Cog, name="サーモンランのスケジュ
         Query salmon run schedules. Recent 1 schedule will be returned as default.
         """
         schedules = get_stages("coop", num)
-        embed = discord.Embed(title="サーモンラン")
-        embed = utils.coop_stage_embed_format('coop', embed, schedules)
-        await ctx.send(embed=embed)
+        for schedule in schedules:
+            embed, file = utils.coop_stage_embed_format2("coop", schedule)
+            await ctx.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class Gear(commands.Cog, name="ゲソタウンのギア"):

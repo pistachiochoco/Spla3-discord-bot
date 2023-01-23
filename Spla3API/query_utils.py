@@ -268,10 +268,9 @@ def get_coop_stages_helper(mode, schedules, repeat):
         schedule.stage.name = schedules[i]["setting"]["coopStage"]["name"]
         schedule.stage.image = schedules[i]["setting"]["coopStage"]["image"]["url"]
 
-        weapons = []
         for j in range(4):
             weapon_name = schedules[i]["setting"]["weapons"][j]["name"]
-            weapon_image = schedules[i]["setting"]["weapons"][j]["image"]
+            weapon_image = schedules[i]["setting"]["weapons"][j]["image"]["url"]
             weapon = BasicElement(weapon_name, weapon_image)
             schedule.weapons.append(weapon)
 
