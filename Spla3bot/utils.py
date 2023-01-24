@@ -1,4 +1,5 @@
 import cv2
+import io
 import numpy as np
 import requests
 import discord
@@ -33,8 +34,11 @@ COLOR_DICT = {
 BACKGROUND_COLOR = (0, 0, 0, 255)
 
 
-def load_web_image(url):
-    '''Fetches web image by GET request and returns it in opencv-format.'''
+def load_web_image_prev(url):
+    '''
+    Deprecated.
+    Fetches web image by GET request and returns it in opencv-format.
+    '''
     response = requests.get(url, stream=True).raw
     image = np.asarray(bytearray(response.read()), dtype="uint8")
     image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
@@ -54,8 +58,21 @@ def load_web_image(url):
     return image_cv
 
 
-def horizontal_concat_images(urls):
-    '''Concatenates images horizontally and returns concatenated image.'''
+def load_web_image(url):
+    '''Fetches web image by GET request and returns it in pillow-format.'''
+    response = requests.get(url, stream=True)
+    image = Image.open(io.BytesIO(response.content))
+    background = Image.new("RGBA", image.size, BACKGROUND_COLOR)
+    image = Image.alpha_composite(background, image)
+
+    return image
+
+
+def horizontal_concat_images_prev(urls):
+    '''
+    Deprecated.
+    Concatenates images horizontally and returns concatenated image.
+    '''
     images = []
     for url in urls:
         image = load_web_image(url)
@@ -64,8 +81,28 @@ def horizontal_concat_images(urls):
     return images_concat
 
 
-def vertical_concat_images(urls):
-    '''Concatenates images vertically and returns concatenated image.'''
+def horizontal_concat_images(urls):
+    '''Concatenates images horizontally and returns concatenated image.'''
+    images = []
+    concat_image_width, concat_image_height = 0, 0
+    for url in urls:
+        image = load_web_image(url)
+        images.append(image)
+        concat_image_width += image.width
+        concat_image_height = max(concat_image_height ,image.height)
+    concat_image = Image.new("RGBA", (concat_image_width, concat_image_height))
+    curr_width = 0
+    for image in images:
+        concat_image.paste(image, (curr_width, 0))
+        curr_width += image.width
+    return concat_image
+
+
+def vertical_concat_images_prev(urls):
+    '''
+    Deprecated.
+    Concatenates images vertically and returns concatenated image.
+    '''
     images = []
     for url in urls:
         image = load_web_image(url)
@@ -74,14 +111,44 @@ def vertical_concat_images(urls):
     return images_concat
 
 
-def vertical_concat_images_coop(img1, img2):
-    '''Concatanates two images vertically with different width.'''
+def vertical_concat_images(urls):
+    '''Concatenates images vertically and returns concatenated image.'''
+    images = []
+    concat_image_width, concat_image_height = 0, 0
+    for url in urls:
+        image = load_web_image(url)
+        images.append(image)
+        concat_image_width = max(concat_image_width ,image.width)
+        concat_image_height += image.height
+    concat_image = Image.new("RGBA", (concat_image_width, concat_image_height))
+    curr_height= 0
+    for image in images:
+        concat_image.paste(image, (0, curr_height))
+        curr_height += image.width
+    return concat_image
+
+
+def vertical_concat_images_coop_prev(img1, img2):
+    '''
+    Deprecated.
+    Concatanates two images vertically with different width.
+    '''
     width1 = img1.shape[1]
     width2 = img2.shape[1]
     factor = width2 / width1
     img1 = cv2.resize(img1, dsize=None, fx=factor, fy=factor)
     images_concat = cv2.vconcat([img1, img2])
     return images_concat
+
+
+def vertical_concat_images_coop(img1, img2):
+    '''Concatanates two images vertically with different width.'''
+    factor = img2.width / img1.width
+    img1 = img1.resize((img2.width, int(img1.height * factor)))
+    concat_image = Image.new("RGBA", (img1.width, img1.height + img2.height))
+    concat_image.paste(img1, (0, 0))
+    concat_image.paste(img2, (0, img1.height))
+    return concat_image
 
 
 def concat_images_coop(weapon_urls, stage_url):
@@ -92,7 +159,8 @@ def concat_images_coop(weapon_urls, stage_url):
     return coop_image
 
 
-def concat_images_gear(power_urls, gear_url):
+def concat_images_gear_prev(power_urls, gear_url):
+    '''Deprecated.'''
     power_image = horizontal_concat_images(power_urls)
 
     # gear power image size is 100x100
@@ -107,6 +175,20 @@ def concat_images_gear(power_urls, gear_url):
     return concat_image
 
 
+def concat_images_gear(power_urls, gear_url):
+    '''Generate gear image with main power image and gear image.'''
+    power_image = horizontal_concat_images(power_urls)
+    power_image_size = power_image.height
+
+    # gear power image size is 100x100
+    img_black = Image.new("RGBA", (power_image_size * 4, power_image_size), BACKGROUND_COLOR)
+    img_black.paste(power_image, (0, 0))
+
+    gear_image = load_web_image(gear_url)
+    concat_image = vertical_concat_images_coop(gear_image, img_black)
+    return concat_image
+
+
 def embed_set_images_from_urls(urls, embed):
     '''Sets concatenated image to embed from image urls.'''
     image_concat = horizontal_concat_images(urls)
@@ -117,7 +199,8 @@ def embed_set_images_from_urls(urls, embed):
 def embed_set_image(image, embed):
     '''Sets concatenated image to embed.'''
     file_name = "image_concat.png"
-    cv2.imwrite(file_name, image)
+    # cv2.imwrite(file_name, image)
+    image.save(file_name)
     file = discord.File(file_name, filename=file_name)
     embed.set_image(url=f"attachment://{file_name}")
     return embed, file
@@ -192,3 +275,17 @@ def xranking_embed_format(embed, ranking):
     for player in ranking:
         embed.add_field(name="", value=player, inline=False)
     return embed
+
+# for test
+if __name__ == '__main__':
+    url = "https://api.lp1.av5ja.srv.nintendo.net/resources/prod/skill_img/aaa9b7e95a61bfd869aaa9beb836c74f9b8d4e5d4186768a27d6e443c64f33ce_0.png?Expires=1704844800&Signature=SHgU8h1htngLkcrajryd~JMDuf5mOtXkOhf1FLTXFo9RXBT5LQH0IbVzplW03liu9V1MQTvSrqyt2QTqyPKg3i~BAQLvGvbu6tZV7nl2lwGhUmM8M-qEWwmyYgDtIz33kG8lBagBE35UGky87TX86Z325CnVJvYkifmiKIeUN7M6V3YjwUlgDRnLP0~GWKrIG6HVbGXXUkqYD8tGTDhQ9uV5yfa5pIqOwMWbHEqZtVCwqRoa~yv4k9WADkBAcDATgP-7yhLOZWzyNcp1xJO-yKjh7MG83S-g3p8DW3RZL3hv~7zpy0SS7R6e5N5Hju2RQPL-nSmGW3IhrgsawMrHyA__&Key-Pair-Id=KNBS2THMRC385"
+    urls = [url, url]
+    img1 = load_web_image(url)
+    img2 = horizontal_concat_images(urls)
+    img3 = vertical_concat_images(urls)
+    img4 = vertical_concat_images_coop(img2, img1)
+    gear = "https://api.lp1.av5ja.srv.nintendo.net/resources/prod/gear_img/a7f88319920704c32079b9246bbbd1be236e456f6d780a8e23bef96e49db956f_0.png?Expires=1704844800&Signature=i-EvO6pBDOLq7Or62TnqcBP7UCFeFKocVqPjt7oImdbH2ZrPiUy1fdR6Mh5JjLBkuwbyGEv7v5k3lf6ps2qp8LO6iynUx0hzfZgymMQQ9H5tcEj3UWIFZaT6zpHYHUBdt3Br7nyMyr-IIt6zDDH97Sy5ERV7gYAmu-I62d7oV2dJn8qFML~jjVhEhb7m9BOLs0HVLVcU~veEDddvXpGKmyRYK3PAw4VwN4H9HN8A-i9WtWWpv7iHkRU6Cam3k8sSAY~BQtncXfx7EIKJ9oCGqemNW8tBugvz-748PEM~O8xQhc5me9uUL0QUKlR6xon0wFHoBZMRJfsgQvx5XIKGUg__&Key-Pair-Id=KNBS2THMRC385"
+    img5 = concat_images_gear(urls, gear)
+    print(img5.size)
+    img5.show()
+

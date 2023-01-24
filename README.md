@@ -9,4 +9,5 @@
 5. ~~Find a good way to insert stages'/weapons' image into message~~ ~~gear~~
 6. Find a way to make this bot running all the time
 7. ~~ルール別ステージ返してほしい (/yaguraでいくつかのヤグラスケジュールを返す的な)~~
-8. replace opencv methods with PIL
+8. ~~replace opencv methods with PIL~~
+9. add commands into discord
