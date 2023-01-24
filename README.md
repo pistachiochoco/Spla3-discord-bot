@@ -45,9 +45,7 @@ player of each rule.
 
 
 ## Demo
-A little bit slow...<br>
-[![Demo Video](https://img.youtube.com/vi/0GL2J_oQU4k/0.jpg)](https://www.youtube.com/watch?v=0GL2J_oQU4k)
-
+try to find a better way to embed
 
 <br>
 
