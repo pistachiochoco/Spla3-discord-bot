@@ -16,7 +16,8 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
   - Challege(チャレンジ): `/challenge <number(optional, default=3)>`
   - Open(オープン): `/open <number(optional, default=3)>`
 - X Match(Xマッチ): `/xmatch <number(optional, default=3)>`
-- ~~League Match(リーグマッチ): `/league <number(optional, default=3)>`~~
+- League Match(リーグマッチ): `/league <number(optional, default=3)>`
+  - Not implemented in game now
 
 `<number>` is an optional argument, the default value is 3 which means if you send `/open`, it will return recent 3 
 schedules by time.<br> If you send  `/open 5`, it will return recent 5 schedules by time.<br>
@@ -24,13 +25,13 @@ schedules by time.<br> If you send  `/open 5`, it will return recent 5 schedules
 ### Fetch battle schedules by rule (ルール別)
 - Splat Zones(ガチエリア): `/area <rule(optional, default=xmatch)>`
 - Tower Control(ガチヤグラ): `/yagura <rule(optional, default=xmatch)>`
-- Rainmaker: `/hoko <rule(optional, default=xmatch)>`
-- Clam Blitz: `/asari <rule(optional, default=xmatch)>`
+- Rainmaker(ガチホコバトル): `/hoko <rule(optional, default=xmatch)>`
+- Clam Blitz(ガチアサリ): `/asari <rule(optional, default=xmatch)>`
 
 `<rule>` is an optional argument, the default value is `xmatch` which means it will return X Match schedules of the 
 input rule. If you send `/area`, it will return all available Splat Zones schedules of X Match by time. If you want to
 know Splat Zones of Bankara Match Challenge, you can send command `/area challenge`. <br>
-The rule values supported are `xmatch`, `open`, `challenge`~~, `league`~~.<br>
+The rule values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 
 ### Fetch sale gear(ゲソタウン)
 - All sale gears: `/gear`
@@ -44,10 +45,11 @@ player of each rule.
 
 
 ## Demo
-uploading...
+A little bit slow...<br>
+[![Demo Video](https://img.youtube.com/vi/0GL2J_oQU4k/0.jpg)](https://www.youtube.com/watch?v=0GL2J_oQU4k)
 
 
-<br><br>
+<br>
 
 ## TODOs
 1. Make query utils applicable for Fest(March) and Big Run(Feb)
