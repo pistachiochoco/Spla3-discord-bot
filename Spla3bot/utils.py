@@ -1,5 +1,4 @@
 import io
-import numpy as np
 import requests
 import discord
 from PIL import Image
