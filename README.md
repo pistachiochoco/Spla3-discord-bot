@@ -33,6 +33,9 @@ input rule. If you send `/area`, it will return all available Splat Zones schedu
 know Splat Zones of Bankara Match Challenge, you can send command `/area challenge`. <br>
 The rule values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 
+### Fetch salmon-run schedules by time (時間順)
+- Salmon Run(サーモンラン、バイト): `/salmon <number(optional, default=1)>`
+
 ### Fetch sale gear(ゲソタウン)
 - All sale gears: `/gear`
 
@@ -45,7 +48,7 @@ player of each rule.
 
 
 ## Demo
-try to find a better way to embed
+[demo video.mp4](https://user-images.githubusercontent.com/85484153/214571258-cee6e87e-a4c0-4b99-ba22-f289a5119315.mp4)
 
 <br>
 
