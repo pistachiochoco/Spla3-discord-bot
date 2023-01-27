@@ -54,6 +54,7 @@ class Gear:
         self.end = None
         self.type = None
         self.left_time = None
+        self.id = None
 
     def __str__(self):
         end_time = (self.end - datetime.datetime.now())
@@ -331,6 +332,7 @@ def get_gear_helper(data, is_daily=False):
         gear.type = gear_data["gear"]["__typename"]
         gear.is_daily = is_daily
         gear.slot = len(gear_data["gear"]["additionalGearPowers"])
+        gear.id = gear_data["id"]
         gear_list.append(gear)
 
     return gear_list
