@@ -23,18 +23,18 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 schedules by time.<br> If you send  `/open 5`, it will return recent 5 schedules by time.<br>
 
 ### Fetch battle schedules by rule (ルール別)
-- Splat Zones(ガチエリア): `/area <rule(optional, default=xmatch)>`
-- Tower Control(ガチヤグラ): `/yagura <rule(optional, default=xmatch)>`
-- Rainmaker(ガチホコバトル): `/hoko <rule(optional, default=xmatch)>`
-- Clam Blitz(ガチアサリ): `/asari <rule(optional, default=xmatch)>`
+- Splat Zones(ガチエリア): `/area <mode(optional, default=xmatch)>`
+- Tower Control(ガチヤグラ): `/yagura <mode(optional, default=xmatch)>`
+- Rainmaker(ガチホコバトル): `/hoko <mode(optional, default=xmatch)>`
+- Clam Blitz(ガチアサリ): `/asari <mode(optional, default=xmatch)>`
 
-`<rule>` is an optional argument, the default value is `xmatch` which means it will return X Match schedules of the 
+`<mode>` is an optional argument, the default value is `xmatch` which means it will return X Match schedules of the 
 input rule. If you send `/area`, it will return all available Splat Zones schedules of X Match by time. If you want to
 know Splat Zones of Bankara Match Challenge, you can send command `/area challenge`. <br>
-The rule values supported are `xmatch`, `open`, `challenge`, `league`.<br>
+The mode values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 
 ### Fetch salmon-run schedules by time (時間順)
-- Salmon Run(サーモンラン、バイト): `/salmon <number(optional, default=1)>`
+- Salmon Run(サーモンラン): `/salmon <number(optional, default=1)>`
 
 ### Fetch sale gear(ゲソタウン)
 - All sale gears: `/gear`
@@ -43,8 +43,10 @@ The rule values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 - X-ranking: `/xrank <rule(optional, default=ALL)>, <number(optional, default=10)>`
 
 `<rule>` is an optional argument, the default value is `ALL` which means it will return X-ranking of all rules. <br>
+The rule values supported are `area`(エリア), `tower`(ヤグラ), `rainmaker`(ホコ), `clam`.<br>(アサリ)
 `<number>` is an optional argument, the default value is 10 which means if you send `/xrank`, it will return top 10 
 player of each rule.
+
 
 
 ## Demo
@@ -53,6 +55,7 @@ player of each rule.
 <br>
 
 ## TODOs
-1. Make query utils applicable for Fest(March) and Big Run(Feb)
-2. Add all commands into Discord (?)
+1. Make query utils applicable for Fest(2.11~2.13) and Big Run(???)
+2. Add all commands into Discord (?) commands -> app_commands
 6. Find a way to make this bot always online
+
