@@ -43,9 +43,9 @@ The mode values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 - X-ranking: `/xrank <rule(optional, default=ALL)>, <number(optional, default=10)>`
 
 `<rule>` is an optional argument, the default value is `ALL` which means it will return X-ranking of all rules. <br>
-The rule values supported are `area`(エリア), `tower`(ヤグラ), `rainmaker`(ホコ), `clam`.<br>(アサリ)
+The rule values supported are `area`(エリア), `tower`(ヤグラ), `rainmaker`(ホコ), `clam`(アサリ).<br>
 `<number>` is an optional argument, the default value is 10 which means if you send `/xrank`, it will return top 10 
-player of each rule.
+players of each rule.
 
 
 
