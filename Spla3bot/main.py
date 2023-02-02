@@ -17,7 +17,7 @@ class Bot(commands.Bot):
         intents.message_content = True
 
         super().__init__(
-            command_prefix='/',
+            command_prefix='?',
             intents=intents,
             case_insensitive=True,
             help_command=commands.DefaultHelpCommand(no_category="ヘルプコマンド")
@@ -28,13 +28,15 @@ class Bot(commands.Bot):
         print('------')
 
     async def setup_hook(self):
-        extension = "spla3"
-        try:
-            await bot.load_extension(f"cogs.{extension}")
-            print(f"Loaded extension {extension}")
-        except Exception as e:
-            exception = f"{type(e).__name__}: {e}"
-            print(f"Failed to load extension {extension}\n{exception}")
+        for filename in os.listdir('./cogs'):
+            if filename.endswith('.py'):
+                extension = filename[:-3]
+                try:
+                    await bot.load_extension(f"cogs.{extension}")
+                    print(f"Loaded extension {extension}")
+                except Exception as e:
+                    exception = f"{type(e).__name__}: {e}"
+                    print(f"Failed to load extension {extension}\n{exception}")
 
 
 bot = Bot()

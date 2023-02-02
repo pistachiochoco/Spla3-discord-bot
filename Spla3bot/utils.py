@@ -108,30 +108,30 @@ def concat_images_gear(power_urls, gear_url):
     return concat_image
 
 
-def embed_set_images_from_urls(urls, embed):
+def embed_set_images_from_urls(urls, embed, index):
     '''Sets concatenated image to embed from image urls.'''
     image_concat = horizontal_concat_images(urls)
-    embed, file = embed_set_image(image_concat, embed)
+    embed, file = embed_set_image(image_concat, embed, index)
     return embed, file
 
 
-def embed_set_image(image, embed):
+def embed_set_image(image, embed, index):
     '''Sets concatenated image to embed.'''
-    file_name = "image_concat.png"
+    file_name = f"image_concat_{index}.png"
     image.save(file_name)
     file = discord.File(file_name, filename=file_name)
     embed.set_image(url=f"attachment://{file_name}")
     return embed, file
 
 
-def battle_stage_embed_format(mode, schedule):
+def battle_stage_embed_format(mode, schedule, index=0):
     '''Generates one embed message for one battle schedule.'''
     time_str = schedule.start.strftime("%-m月%-d日 %-H:%Mから")
     embed = discord.Embed(title=f"{MODE_DICT[mode]} {time_str}")
     embed.add_field(name="ルール", value=schedule.rule, inline=True)
     embed.add_field(name="ステージ", value=f"{schedule.stages[0]}　　{schedule.stages[1]}", inline=False)
     image_urls = [schedule.stages[i].image for i in range(2)]
-    embed, file = embed_set_images_from_urls(image_urls, embed)
+    embed, file = embed_set_images_from_urls(image_urls, embed, index)
     return embed, file
 
 
@@ -148,7 +148,7 @@ def stage_embed_format_prev(mode, embed, schedules):
     return embed, file
 
 
-def coop_stage_embed_format(mode, schedule):
+def coop_stage_embed_format(mode, schedule, index=0):
     '''Generates one embed message for one salmon run schedule.'''
     embed = discord.Embed(title=f"{MODE_DICT[mode]}")
     time_str = schedule.start.strftime("%-m月%-d日 %-H:%Mから") + " " + schedule.end.strftime("%-m月%-d日 %-H:%Mまで")
@@ -158,7 +158,7 @@ def coop_stage_embed_format(mode, schedule):
     weapon_image_urls = [schedule.weapons[i].image for i in range(4)]
     stage_image_url = schedule.stage.image
     coop_image = concat_images_coop(weapon_image_urls, stage_image_url)
-    embed, file = embed_set_image(coop_image, embed)
+    embed, file = embed_set_image(coop_image, embed, index)
     return embed, file
 
 
@@ -175,7 +175,7 @@ def coop_stage_embed_format_prev(mode, embed, schedules):
     return embed
 
 
-def gear_embed_format(embed, gear):
+def gear_embed_format(embed, gear, index=0):
     '''Generate one embed message for one gear.'''
     embed.add_field(name="残り時間", value=f"あと{gear.left_time}", inline=True)
     embed.add_field(name="ブランド", value=gear.brand, inline=True)
@@ -185,7 +185,7 @@ def gear_embed_format(embed, gear):
     gear_power_image_urls = [gear.main_power.image] + [gear.sub_power.image for _ in range(gear.slot)]
     gear_image_url = gear.info.image
     gear_image = concat_images_gear(gear_power_image_urls, gear_image_url)
-    embed, file = embed_set_image(gear_image, embed)
+    embed, file = embed_set_image(gear_image, embed, index)
     return embed, file
 
 
