@@ -19,7 +19,7 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 - League Match(リーグマッチ): `/league <number>`
   - Not implemented in game now
 
-`<number>` is a required argument which means the number of schedules it will be returned.
+`<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `12`.
 <br><br>
 ### Commands with prefix `?`
 #### Fetch battle schedules by time (時間順)
