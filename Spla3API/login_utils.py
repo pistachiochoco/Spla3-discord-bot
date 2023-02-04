@@ -1,4 +1,6 @@
 import os, json
+import sys
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -241,9 +243,10 @@ def get_bullet_token():
 
 def generate_tokens():
     login_token = get_login_token()
-    get_web_service_token(login_token)
-    get_bullet_token()
+    web_service_token = get_web_service_token(login_token)
+    bullet_token = get_bullet_token()
     write_config()
+    return web_service_token, bullet_token
 
 
 def validate_tokens():
@@ -301,7 +304,7 @@ def validate_bullet_token():
         'X-Apollo-Operation-Id': operation_id,
         'X-Apollo-Operation-Name': operation_type,
         'X-Apollo-Operation-Type': 'query',
-        'Authorization': f'Bearer {bullet_token}'
+        'Authorization': f'Bearer {BULLET_TOKEN}'
     }
     body = {
         "extensions": {
@@ -325,3 +328,8 @@ def write_config():
     config_file.seek(0)
     config_file.write(json.dumps(config_data, indent=4, separators=(',', ': ')))
     config_file.close()
+
+
+if __name__ == '__main__':
+    print(validate_bullet_token())
+    sys.exit(0)

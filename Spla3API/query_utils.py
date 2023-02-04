@@ -1,8 +1,6 @@
 import requests
 import json, os, sys
 import datetime
-from login_utils import validate_tokens, generate_tokens
-
 
 class BasicElement:
     '''
@@ -149,16 +147,29 @@ def generate_graphql_request(request_item):
 
     return header, cookie, body
 
+def get_stage_index_string(mode):
+    '''
+    Returns strings as index when loading json data.
+    '''
+    if mode == 'regular':
+        return "regularSchedules", "regularMatchSetting"
+    elif mode in ('open', 'challenge'):
+        return "bankaraSchedules", "bankaraMatchSettings"
+    elif mode == 'xmatch':
+        return "xSchedules", "xMatchSetting"
+    elif mode == 'league':
+        return "leagueSchedules", "leagueMatchSetting"
+    elif mode == 'fest':
+        return "festSchedules", "festMatchSetting"
+    elif mode == 'coop':
+        return "coopGroupingSchedule", "regularSchedules", "bigRunSchedules"
+
 
 def get_stages(mode, repeat=3):
     '''
     Fetches regular, bankara, X-match, (league) battle schedules and coop schedule.
     '''
-
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
-
+    load_tokens()
     header, cookie, body = generate_graphql_request('StageScheduleQuery')
     response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
     if response.status_code != 200:
@@ -186,24 +197,6 @@ def get_stages(mode, repeat=3):
         schedule_list = get_coop_stages_helper(mode, schedules, repeat)
 
     return schedule_list
-
-
-def get_stage_index_string(mode):
-    '''
-    Returns strings as index when loading json data.
-    '''
-    if mode == 'regular':
-        return "regularSchedules", "regularMatchSetting"
-    elif mode in ('open', 'challenge'):
-        return "bankaraSchedules", "bankaraMatchSettings"
-    elif mode == 'xmatch':
-        return "xSchedules", "xMatchSetting"
-    elif mode == 'league':
-        return "leagueSchedules", "leagueMatchSetting"
-    elif mode == 'fest':
-        return "festSchedules", "festMatchSetting"
-    elif mode == 'coop':
-        return "coopGroupingSchedule", "regularSchedules", "bigRunSchedules"
 
 
 def get_battle_stages_helper(mode, schedules, mode_setting, repeat):
@@ -258,7 +251,6 @@ def get_coop_stages_helper(mode, schedules, repeat):
     '''
     A helper function for loading data from json response.
     '''
-
     schedule_list = []
 
     for i in range(repeat):
@@ -285,11 +277,7 @@ def get_gesotown(only_daily=False, only_regular=False):
     '''
     Fetches sale gears in Gesotown.
     '''
-
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
-
+    load_tokens()
     header, cookie, body = generate_graphql_request('GesotownQuery')
     response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
     if response.status_code != 200:
@@ -314,7 +302,6 @@ def get_gear_helper(data, is_daily=False):
     '''
     A helper function for loading gear info from json response.
     '''
-
     gear_list = []
     for gear_data in data:
         gear = Gear()
@@ -343,9 +330,7 @@ def get_current_season():
     A helper function for fetching current season ID.
     2020 Chill Season: WFJhbmtpbmdTZWFzb24tcDoy
     '''
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
+    load_tokens()
 
     header, cookie, body = generate_graphql_request('XRankingQuery')
     response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
@@ -378,9 +363,7 @@ def get_x_ranking(rule="ALL", num=10):
     '''
     Fetches X-ranking top 25 players each rule.
     '''
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
+    load_tokens()
 
     current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
     header, cookie, body = generate_graphql_request('XRankingDetailQuery')
@@ -411,11 +394,7 @@ def get_x_ranking_borderline():
     Fetches X-ranking 500th player's X-power of each rule.
     '''
     # current_season_id = get_current_season()
-
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
-
+    load_tokens()
     current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
     body = {}
     header, cookie, body["Ar"] = generate_graphql_request('DetailTabViewXRankingArRefetchQuery')
@@ -445,11 +424,7 @@ def get_stages_by_rule(rule='Ar', mode='xmatch'):
     '''
     Returns stages by rule(Splat Zone / Tower control / Rainmaker / Clam blitz).
     '''
-
-    if not validate_tokens():
-        generate_tokens()
-        load_tokens()
-
+    load_tokens()
     header, cookie, body = generate_graphql_request('StageScheduleQuery')
     response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
     if response.status_code != 200:

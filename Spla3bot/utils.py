@@ -46,11 +46,16 @@ def horizontal_concat_images(urls):
     '''Concatenates images horizontally and returns concatenated image.'''
     images = []
     concat_image_width, concat_image_height = 0, 0
+    # TODO: Uniform weapon image size for salmon run
+    # new weapon image size (400x400)
+    # old weapon image size (256x256)
     for url in urls:
         image = load_web_image(url)
+        if image.size == (400, 400):
+            image = image.resize((256, 256))
         images.append(image)
         concat_image_width += image.width
-        concat_image_height = max(concat_image_height ,image.height)
+        concat_image_height = max(concat_image_height, image.height)
     concat_image = Image.new("RGBA", (concat_image_width, concat_image_height))
     curr_width = 0
     for image in images:
@@ -193,3 +198,34 @@ def xranking_embed_format(embed, ranking):
     for player in ranking:
         embed.add_field(name="", value=player, inline=False)
     return embed
+
+
+def get_embeds(mode, schedules):
+    embeds, files = [], []
+    for i, schedule in enumerate(schedules):
+        if mode == 'coop':
+            embed, file = coop_stage_embed_format(mode, schedule, i)
+        else:
+            embed, file = battle_stage_embed_format(mode, schedule, i)
+        embeds.append(embed)
+        files.append(file)
+    return embeds, files
+
+
+def get_embeds_gears(gears):
+    embeds, files = [], []
+    for i, gear in enumerate(gears):
+        embed = discord.Embed(title=gear.info)
+        embed, file = gear_embed_format(embed, gear, i)
+        embeds.append(embed)
+        files.append(file)
+    return embeds, files
+
+
+def get_embeds_xranking(rankings):
+    embeds = []
+    for rule, ranking in rankings.items():
+        embed = discord.Embed(title=RULE_DICT[rule])
+        embed = xranking_embed_format(embed, ranking)
+        embeds.append(embed)
+    return embeds

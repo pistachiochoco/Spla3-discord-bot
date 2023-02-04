@@ -11,6 +11,7 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 
 ## Usage 
 ### Slash commands (prefix `/`)
+#### Fetch battle schedules by time (時間順)
 - Regular Match(レギュラーマッチ): `/regular <number>`
 - Bankara Match(バンカラマッチ):
   - Challenge(チャレンジ): `/challenge <number>`
@@ -21,6 +22,31 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 
 `<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `12`.
 <br><br>
+
+#### Fetch battle schedules by rule (ルール別)
+- Splat Zones(ガチエリア): `/area <mode>`
+- Tower Control(ガチヤグラ): `/yagura <mode>`
+- Rainmaker(ガチホコバトル): `/hoko <mode>`
+- Clam Blitz(ガチアサリ): `/asari <mode>`
+
+`<mode>`: The mode values supported are `xmatch`, `open`, `challenge`, `league`.<br><br>
+
+#### Fetch salmon-run schedules by time (時間順)
+- Salmon Run(サーモンラン): `/salmon <number>`
+
+`<number>`: The maximum of this value is `5`.
+<br><br>
+
+#### Fetch sale gear(ゲソタウン)
+- All sale gears: `/gear`
+
+#### Fetch X-ranking (only top 25 available for now)
+- X-ranking: `/xrank <rule>, <number>`
+
+`<rule>`: The rule values supported are `area`(エリア), `tower`(ヤグラ), `rainmaker`(ホコ), `clam`(アサリ).<br>
+`<number>`: The maximum of this value is `25`.
+<br><br>
+
 ### Commands with prefix `?`
 #### Fetch battle schedules by time (時間順)
 - Regular Match(レギュラーマッチ): `?regular <number(optional, default=3)>`
@@ -49,7 +75,7 @@ The mode values supported are `xmatch`, `open`, `challenge`, `league`.<br>
 - Salmon Run(サーモンラン): `?salmon <number(optional, default=1)>`
 
 #### Fetch sale gear(ゲソタウン)
-- All sale gears: `/gear`
+- All sale gears: `?gear`
 
 #### Fetch X-ranking (only top 25 available for now)
 - X-ranking: `?xrank <rule(optional, default=ALL)>, <number(optional, default=10)>`
@@ -63,7 +89,7 @@ players of each rule.
 
 ## Demo
 ### Slash command
-[demo video2.mp4](https://user-images.githubusercontent.com/85484153/216255455-6525e357-d954-426f-b01e-74ba3ea2200e.mp4)
+[demo video2.mp4](https://user-images.githubusercontent.com/85484153/216753490-572b4239-5e8e-4463-8741-0cc63be143b5.mp4)
 
 ### Previous
 [demo video.mp4](https://user-images.githubusercontent.com/85484153/214571258-cee6e87e-a4c0-4b99-ba22-f289a5119315.mp4)
@@ -72,6 +98,9 @@ players of each rule.
 
 ## TODOs
 1. Make query utils applicable for Fest(2.11~2.13) and Big Run(???)
-2. Add all commands into Discord (?) commands -> app_commands (in progress)
-3. Find a way to make this bot always online
+2. Find a way to make this bot always online
+3. ~~The validity period of tokens of spla3 API is 2 hours so generating tokens every 2 hours rather than generating 
+tokens when send commands may make bot response faster(?)~~ `tasks.look()`
+or saving schedules every 2 hours and reading data locally may be faster(?)
+4. find which process is slow
 
