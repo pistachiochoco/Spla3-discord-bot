@@ -20,7 +20,7 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 - League Match(リーグマッチ): `/league <number>`
   - Not implemented in game now
 
-`<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `10`(discord.py embeds limit).
+`<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `12`.
 <br><br>
 
 #### Fetch battle schedules by rule (ルール別)
@@ -88,7 +88,13 @@ players of each rule.
 
 
 
+
+
+
 ## Demo
+### Slash command (save data locally)
+[demo video3.mp4](https://user-images.githubusercontent.com/85484153/216977236-2ea39b93-8e23-4151-8cb3-725274d78424.mp4)
+
 ### Slash command
 [demo video2.mp4](https://user-images.githubusercontent.com/85484153/216753490-572b4239-5e8e-4463-8741-0cc63be143b5.mp4)
 
