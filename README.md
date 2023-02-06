@@ -20,7 +20,7 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 - League Match(リーグマッチ): `/league <number>`
   - Not implemented in game now
 
-`<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `12`.
+`<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `10`(discord.py embeds limit).
 <br><br>
 
 #### Fetch battle schedules by rule (ルール別)
@@ -39,6 +39,7 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 
 #### Fetch sale gear(ゲソタウン)
 - All sale gears: `/gear`
+<br><br>
 
 #### Fetch X-ranking (only top 25 available for now)
 - X-ranking: `/xrank <rule>, <number>`
@@ -101,6 +102,5 @@ players of each rule.
 2. Find a way to make this bot always online
 3. ~~The validity period of tokens of spla3 API is 2 hours so generating tokens every 2 hours rather than generating 
 tokens when send commands may make bot response faster(?)~~ `tasks.look()`
-or saving schedules every 2 hours and reading data locally may be faster(?)
-4. find which process is slow
-
+~~or saving schedules every 2 hours and reading data locally may be faster(?)~~
+4. ~~find which process is slow~~(?)

@@ -165,34 +165,73 @@ def get_stage_index_string(mode):
         return "coopGroupingSchedule", "regularSchedules", "bigRunSchedules"
 
 
+def save_data(name, path=self_path):
+    '''
+    A helper function for saving data locally.
+    '''
+    if 'schedule' in name:
+        request_name = 'StageScheduleQuery'
+    elif 'gesotown' in name:
+        request_name = 'GesotownQuery'
+    header, cookie, body = generate_graphql_request(request_name)
+    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    if response.status_code != 200:
+        raise Exception("Request Failed!")
+    data = json.loads(response.text)
+    save_path = os.path.join(path, name)
+    data_file = open(save_path, "w")
+    data_file.seek(0)
+    data_file.write(json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False))
+    data_file.close()
+    return
+
+
+def load_data(name):
+    '''
+    A helper function for loading schedules data locally.
+    '''
+    path = os.path.join(self_path, name)
+    data_file = open(path, "r")
+    data = json.load(data_file)
+    data_file.close()
+
+    return data
+
+
 def get_stages(mode, repeat=3):
     '''
     Fetches regular, bankara, X-match, (league) battle schedules and coop schedule.
     '''
-    load_tokens()
-    header, cookie, body = generate_graphql_request('StageScheduleQuery')
-    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
-    if response.status_code != 200:
-        raise Exception("Request Failed!")
+    # load_tokens()
+    # header, cookie, body = generate_graphql_request('StageScheduleQuery')
+    # response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    # if response.status_code != 200:
+    #     raise Exception("Request Failed!")
+
+    schedules_data = load_data('schedules.json')
 
     schedule_list = []
 
     if mode in BATTLE_MODE:
         mode_schedules, mode_setting = get_stage_index_string(mode)
-        is_fest = json.loads(response.text)["data"]["currentFest"]
+        # is_fest = json.loads(response.text)["data"]["currentFest"]
+        is_fest = schedules_data["data"]["currentFest"]
         if is_fest:
             schedule_list.append("フェス期間中だよ！")
         # TODO: return fest schedules
         else:
-            schedules = json.loads(response.text)["data"][mode_schedules]["nodes"]
+            # schedules = json.loads(response.text)["data"][mode_schedules]["nodes"]
+            schedules = schedules_data["data"][mode_schedules]["nodes"]
             repeat = min(repeat, len(schedules))
             schedule_list = get_battle_stages_helper(mode, schedules, mode_setting, repeat)
 
     elif mode == "coop":
         mode_schedules, regular, bigrun = get_stage_index_string(mode)
-        schedules = json.loads(response.text)["data"][mode_schedules][regular]["nodes"]
+        # schedules = json.loads(response.text)["data"][mode_schedules][regular]["nodes"]
+        schedules = schedules_data["data"][mode_schedules][regular]["nodes"]
         if not schedules:
-            json.loads(response.text)["data"][mode_schedules][bigrun]["nodes"]
+            # json.loads(response.text)["data"][mode_schedules][bigrun]["nodes"]
+            schedules = schedules_data["data"][mode_schedules][bigrun]["nodes"]
         repeat = min(repeat, len(schedules))
         schedule_list = get_coop_stages_helper(mode, schedules, repeat)
 
@@ -277,13 +316,13 @@ def get_gesotown(only_daily=False, only_regular=False):
     '''
     Fetches sale gears in Gesotown.
     '''
-    load_tokens()
-    header, cookie, body = generate_graphql_request('GesotownQuery')
-    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
-    if response.status_code != 200:
-        raise Exception("Request Failed!")
+    # load_tokens()
+    # header, cookie, body = generate_graphql_request('GesotownQuery')
+    # response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    # if response.status_code != 200:
+    #     raise Exception("Request Failed!")
 
-    gear_content = json.loads(response.text)
+    gear_content = load_data('gesotown.json')
 
     daily_gear_data = gear_content["data"]["gesotown"]["pickupBrand"]["brandGears"]
     limit_gear_data = gear_content["data"]["gesotown"]["limitedGears"]
@@ -424,13 +463,15 @@ def get_stages_by_rule(rule='Ar', mode='xmatch'):
     '''
     Returns stages by rule(Splat Zone / Tower control / Rainmaker / Clam blitz).
     '''
-    load_tokens()
-    header, cookie, body = generate_graphql_request('StageScheduleQuery')
-    response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
-    if response.status_code != 200:
-        raise Exception("Request Failed!")
+    # load_tokens()
+    # header, cookie, body = generate_graphql_request('StageScheduleQuery')
+    # response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
+    # if response.status_code != 200:
+    #     raise Exception("Request Failed!")
+    schedules_data = load_data('schedules.json')
     mode_schedule, mode_setting = get_stage_index_string(mode)
-    content = json.loads(response.text)["data"][mode_schedule]["nodes"]
+    # content = json.loads(response.text)["data"][mode_schedule]["nodes"]
+    content = schedules_data["data"][mode_schedule]["nodes"]
     schedule_list = get_stages_by_rule_helper(content, rule, mode, mode_setting)
     return schedule_list
 
@@ -480,6 +521,12 @@ def get_stages_by_rule_helper(data, rule, mode, mode_setting):
     return schedule_list
 
 
+
+
+
+
+
 # for test
 if __name__ == '__main__':
+
     sys.exit(0)

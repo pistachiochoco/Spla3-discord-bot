@@ -1,3 +1,4 @@
+import datetime
 import os, sys
 import asyncio
 import discord
@@ -26,14 +27,16 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("open", number)
-        embeds, files = utils.get_embeds('open', schedules)
+        # embeds, files = utils.get_embeds('open', schedules)
         # embeds, files = [], []
-        # for i, schedule in enumerate(schedules):
-        #     embed, file = utils.battle_stage_embed_format("open", schedule, i)
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format("open", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
         #     embeds.append(embed)
         #     files.append(file)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        # await interaction.followup.send(files=files, embeds=embeds)
+        # [os.remove(f"./{file.filename}") for file in files]
 
     @app_commands.command(description="レギュラーマッチのスケジュール")
     @app_commands.describe(
@@ -47,9 +50,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("regular", number)
-        embeds, files = utils.get_embeds('regular', schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format("regular", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(description="バカマチャレンジのスケジュール")
     @app_commands.describe(
@@ -63,9 +67,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("challenge", number)
-        embeds, files = utils.get_embeds('challenge', schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format("challenge", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(description="Xマッチのスケジュール")
     @app_commands.describe(
@@ -79,9 +84,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("xmatch", number)
-        embeds, files = utils.get_embeds('xmatch', schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format("xmatch", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(description="リーグマッチのスケジュール")
     @app_commands.describe(
@@ -95,9 +101,10 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("league", number)
-        embeds, files = utils.get_embeds('league', schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format("league", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッシュコマンド"):
@@ -116,9 +123,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages_by_rule('Ar', mode)
-        embeds, files = utils.get_embeds(mode, schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format(mode, schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(name="yagura", description="ガチヤグラのスケジュール")
     @app_commands.describe(
@@ -132,9 +140,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages_by_rule('Lf', mode)
-        embeds, files = utils.get_embeds(mode, schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format(mode, schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(name="hoko", description="ガチホコバトルのスケジュール")
     @app_commands.describe(
@@ -148,9 +157,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages_by_rule('Gl', mode)
-        embeds, files = utils.get_embeds(mode, schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format(mode, schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @app_commands.command(name="asari", description="ガチアサリのスケジュール")
     @app_commands.describe(
@@ -164,9 +174,10 @@ class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages_by_rule('Cl', mode)
-        embeds, files = utils.get_embeds(mode, schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.battle_stage_embed_format(mode, schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
     @area.autocomplete("mode")
     @tower_control.autocomplete("mode")
@@ -200,9 +211,10 @@ class SalmonScheduleByTime(commands.Cog, name="サーモンランのスケジュ
         await interaction.response.defer()
         await asyncio.sleep(1)
         schedules = get_stages("coop", number)
-        embeds, files = utils.get_embeds("coop", schedules)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, schedule in enumerate(schedules):
+            embed, file = utils.coop_stage_embed_format("coop", schedule, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class Gear(commands.Cog, name="ゲソタウンのギアスラッシュコマンド"):
@@ -214,9 +226,11 @@ class Gear(commands.Cog, name="ゲソタウンのギアスラッシュコマン�
         await interaction.response.defer()
         await asyncio.sleep(1)
         gears = get_gesotown()
-        embeds, files = utils.get_embeds_gears(gears)
-        await interaction.followup.send(files=files, embeds=embeds)
-        [os.remove(f"./{file.filename}") for file in files]
+        for i, gear in enumerate(gears):
+            embed = discord.Embed(title=gear.info)
+            embed, file = utils.gear_embed_format(embed, gear, i)
+            await interaction.followup.send(file=file, embed=embed)
+        os.remove(f"./{file.filename}")
 
 
 class XRanking(commands.Cog, name="Xランキング関連スラッシュコマンド"):

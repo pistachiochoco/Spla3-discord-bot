@@ -122,7 +122,7 @@ def embed_set_images_from_urls(urls, embed, index):
 
 def embed_set_image(image, embed, index):
     '''Sets concatenated image to embed.'''
-    file_name = f"image_concat_{index}.png"
+    file_name = "image_concat.png"
     image.save(file_name)
     file = discord.File(file_name, filename=file_name)
     embed.set_image(url=f"attachment://{file_name}")
@@ -200,26 +200,26 @@ def xranking_embed_format(embed, ranking):
     return embed
 
 
-def get_embeds(mode, schedules):
-    embeds, files = [], []
-    for i, schedule in enumerate(schedules):
-        if mode == 'coop':
-            embed, file = coop_stage_embed_format(mode, schedule, i)
-        else:
-            embed, file = battle_stage_embed_format(mode, schedule, i)
-        embeds.append(embed)
-        files.append(file)
-    return embeds, files
+# def get_embeds(mode, schedules):
+#     embeds, files = [], []
+#     for i, schedule in enumerate(schedules):
+#         if mode == 'coop':
+#             embed, file = coop_stage_embed_format(mode, schedule, i)
+#         else:
+#             embed, file = battle_stage_embed_format(mode, schedule, i)
+#         embeds.append(embed)
+#         files.append(file)
+#     return embeds, files
 
 
-def get_embeds_gears(gears):
-    embeds, files = [], []
-    for i, gear in enumerate(gears):
-        embed = discord.Embed(title=gear.info)
-        embed, file = gear_embed_format(embed, gear, i)
-        embeds.append(embed)
-        files.append(file)
-    return embeds, files
+# def get_embeds_gears(gears):
+#     embeds, files = [], []
+#     for i, gear in enumerate(gears):
+#         embed = discord.Embed(title=gear.info)
+#         embed, file = gear_embed_format(embed, gear, i)
+#         embeds.append(embed)
+#         files.append(file)
+#     return embeds, files
 
 
 def get_embeds_xranking(rankings):
