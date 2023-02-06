@@ -1,7 +1,11 @@
 .idea/
 venv/
 test.py
+bot_test.py
 
 /Spla3API/config.txt
-
+/Spla3API/schedules.json
+/Spla3API/gesotown.json
 /Spla3bot/.env
+
+.DS_Store
