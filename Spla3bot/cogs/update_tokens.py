@@ -7,7 +7,6 @@ sys.path.append("../")
 from login_utils import validate_tokens, generate_tokens
 from query_utils import save_data
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -19,33 +18,32 @@ class UpdateTokens(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.update.start()
-        self.save_gesotonw.start()
+        # self.save_gesotown.start()
 
     def cog_unload(self):
         self.update.cancel()
-        self.save_gesotonw.cancel()
+        # self.save_gesotown.cancel()
 
     @tasks.loop(time=times)
     async def update(self):
+        generate_tokens()
         if validate_tokens() is False:
             logger.error("Tokens are invalid.")
         save_data("schedules.json")
-
-    @tasks.loop(time=times_gear)
-    async def save_gesotown(self):
         save_data("gesotown.json")
+        # print("data updated")
+
+    # @tasks.loop(time=times_gear)
+    # async def save_gesotown(self):
+    #     save_data("gesotown.json")
 
     @update.before_loop
     async def generate(self):
-        global WEB_SERVICE_TOKEN, BULLET_TOKEN
-        WEB_SERVICE_TOKEN, BULLET_TOKEN = generate_tokens()
+        generate_tokens()
         logger.info("Tokens are generated.")
         save_data("schedules.json")
         save_data("gesotown.json")
 
-    # @printer.after_loop
-    # async def after_slow_count(self):
-    #     print('done!')
 
 async def setup(bot):
     await bot.add_cog(UpdateTokens(bot))

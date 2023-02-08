@@ -118,6 +118,8 @@ def load_tokens():
 
 
 def generate_graphql_request(request_item):
+    load_tokens()
+
     header = {
         'User-Agent': USER_AGENT,
         'Accept': '*/*',
