@@ -31,7 +31,6 @@ class UpdateTokens(commands.Cog):
             logger.error("Tokens are invalid.")
         save_data("schedules.json")
         save_data("gesotown.json")
-        # print("data updated")
 
     # @tasks.loop(time=times_gear)
     # async def save_gesotown(self):

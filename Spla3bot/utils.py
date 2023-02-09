@@ -29,16 +29,17 @@ COLOR_DICT = {
     "coop": "",
 }
 
+# BACKGROUND_COLOR_DICT = {"RGBA": (0, 0, 0, 255), "LA": (0, 255)}
 BACKGROUND_COLOR = (0, 0, 0, 255)
-
 
 def load_web_image(url):
     '''Fetches web image by GET request and returns it in pillow-format.'''
     response = requests.get(url, stream=True)
     image = Image.open(io.BytesIO(response.content))
+    if image.mode == "LA":
+        image = image.convert("RGBA")
     background = Image.new("RGBA", image.size, BACKGROUND_COLOR)
     image = Image.alpha_composite(background, image)
-
     return image
 
 
