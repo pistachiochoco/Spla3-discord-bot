@@ -106,6 +106,34 @@ class ScheduleByTime(commands.Cog, name="普通のスケジュールスラッシ
             await interaction.followup.send(file=file, embed=embed)
         os.remove(f"./{file.filename}")
 
+    @app_commands.command(description="フェスマッチのスケジュール")
+    @app_commands.describe(
+        number="ほしいスケジュールの数",
+    )
+    async def fes(
+        self,
+        interaction: discord.Interaction,
+        number: int
+    ):
+        await interaction.response.defer()
+        await asyncio.sleep(1)
+        schedules, fest = get_stages("fest", number)
+        if not fest:
+            await interaction.followup.send("フェスの情報はありません！！")
+        else:
+            embed, file = utils.fest_info_embed_format("fest", fest)
+            if len(schedules) == 0:
+                embed.add_field(name="フェスまだ始まってない！！", value="", inline=False)
+                await interaction.followup.send(file=file, embed=embed)
+                os.remove(f"./{file.filename}")
+            else:
+                await interaction.followup.send(file=file, embed=embed)
+                for i, schedule in enumerate(schedules):
+                    embed, file = utils.battle_stage_embed_format("fest", schedule, i)
+                    await interaction.followup.send(file=file, embed=embed)
+                os.remove(f"./{file.filename}")
+
+
 
 class ScheduleByRule(commands.Cog, name="ルール別スケジュールスラッシュコマンド"):
     def __init__(self, bot):

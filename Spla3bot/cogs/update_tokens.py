@@ -43,6 +43,19 @@ class UpdateTokens(commands.Cog):
         save_data("schedules.json")
         save_data("gesotown.json")
 
+    @commands.command()
+    async def update_data(
+        self,
+        ctx: commands.Context
+    ):
+        '''手動でデータを更新する'''
+        generate_tokens()
+        if validate_tokens() is False:
+            logger.error("Tokens are invalid.")
+        save_data("schedules.json")
+        save_data("gesotown.json")
+        await ctx.send("Manually updated data.")
+
 
 async def setup(bot):
     await bot.add_cog(UpdateTokens(bot))

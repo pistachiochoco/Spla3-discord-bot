@@ -16,6 +16,7 @@ MODE_DICT = {
     "open": "バンカラマッチ オープン",
     "challenge": "バンカラマッチ チャレンジ",
     "league": "リーグマッチ",
+    "fest": "フェスマッチ",
     "coop": "サーモンラン"
 }
 
@@ -133,12 +134,24 @@ def embed_set_image(image, embed, index):
 def battle_stage_embed_format(mode, schedule, index=0):
     '''Generates one embed message for one battle schedule.'''
     time_str = schedule.start.strftime("%-m月%-d日 %-H:%Mから")
-    embed = discord.Embed(title=f"{MODE_DICT[mode]} {time_str}")
+    embed = discord.Embed(title=f"{MODE_DICT[schedule.mode]} {time_str}")
     embed.add_field(name="ルール", value=schedule.rule, inline=True)
     embed.add_field(name="ステージ", value=f"{schedule.stages[0]}　　{schedule.stages[1]}", inline=False)
     image_urls = [schedule.stages[i].image for i in range(2)]
     embed, file = embed_set_images_from_urls(image_urls, embed, index)
     return embed, file
+
+
+def fest_info_embed_format(mode, fest):
+    time_str = fest.start.strftime("%-m月%-d日 %-H:%Mから") + fest.end.strftime("%-m月%-d日 %-H:%Mまで")
+    embed = discord.Embed(title=f"フェス　{fest.title}")
+    embed.add_field(name="時間", value=time_str, inline=False)
+    embed.add_field(name="トリカラステージ", value=f"{fest.tricolorStage}", inline=False)
+    image_url = fest.tricolorStage.image
+    image = load_web_image(image_url)
+    embed, file = embed_set_image(image, embed, 0)
+    return embed, file
+
 
 
 def stage_embed_format_prev(mode, embed, schedules):

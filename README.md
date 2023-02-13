@@ -104,7 +104,7 @@ players of each rule.
 <br>
 
 ## TODOs
-1. Make query utils applicable for Fest(2.11~2.13) and Big Run(???)
+1. Make query utils applicable ~~for Fest(2.11~2.13) and~~ Big Run(???)
 2. Find a way to make this bot always online
 3. ~~The validity period of tokens of spla3 API is 2 hours so generating tokens every 2 hours rather than generating 
 tokens when send commands may make bot response faster(?)~~ `tasks.look()`

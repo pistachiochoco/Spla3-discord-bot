@@ -39,6 +39,15 @@ class Schedule:
         return self.__str__()
 
 
+class Fest:
+    def __init__(self):
+        self.start = None
+        self.mid = None
+        self.end = None
+        self.title = None
+        self.tricolorStage = BasicElement()
+
+
 class Gear:
     def __init__(self):
         self.info = BasicElement()
@@ -216,16 +225,25 @@ def get_stages(mode, repeat=3):
 
     if mode in BATTLE_MODE:
         mode_schedules, mode_setting = get_stage_index_string(mode)
-        # is_fest = json.loads(response.text)["data"]["currentFest"]
-        is_fest = schedules_data["data"]["currentFest"]
-        if is_fest:
-            schedule_list.append("フェス期間中だよ！")
-        # TODO: return fest schedules
-        else:
-            # schedules = json.loads(response.text)["data"][mode_schedules]["nodes"]
-            schedules = schedules_data["data"][mode_schedules]["nodes"]
-            repeat = min(repeat, len(schedules))
-            schedule_list = get_battle_stages_helper(mode, schedules, mode_setting, repeat)
+        schedules = schedules_data["data"][mode_schedules]["nodes"]
+        repeat = min(repeat, len(schedules))
+
+        current_fest = schedules_data["data"]["currentFest"]
+        fest_schedules = []
+        fest = None
+        if current_fest:
+            fest = Fest()
+            fest.start = datetime.datetime.strptime(current_fest["startTime"], TIME_FORMAT) + UTC_TO_JST
+            fest.mid = datetime.datetime.strptime(current_fest["midtermTime"], TIME_FORMAT) + UTC_TO_JST
+            fest.end = datetime.datetime.strptime(current_fest["endTime"], TIME_FORMAT) + UTC_TO_JST
+            fest.title = current_fest["title"]
+            fest.tricolorStage.name = current_fest["tricolorStage"]["name"]
+            fest.tricolorStage.image = current_fest["tricolorStage"]["image"]["url"]
+
+            fest_mode_schedules, fest_mode_setting = get_stage_index_string("fest")
+            fest_schedules = schedules_data["data"][fest_mode_schedules]["nodes"]
+
+        schedule_list = get_battle_stages_helper(mode, schedules, fest_schedules, mode_setting, repeat)
 
     elif mode == "coop":
         mode_schedules, regular, bigrun = get_stage_index_string(mode)
@@ -237,51 +255,98 @@ def get_stages(mode, repeat=3):
         repeat = min(repeat, len(schedules))
         schedule_list = get_coop_stages_helper(mode, schedules, repeat)
 
-    return schedule_list
+    if mode == "fest":
+        return schedule_list, fest
+    else:
+        return schedule_list
 
 
-def get_battle_stages_helper(mode, schedules, mode_setting, repeat):
+def get_battle_stages_helper(mode, schedules, fest_schedules, mode_setting, repeat):
     '''
     A helper function for loading data from json response.
     '''
 
     schedule_list = []
-    if mode in ("open", "challenge"):
+    if mode == "fest":
+        for i in range(repeat):
+            if not schedules[i][mode_setting]:
+                continue
+            else:
+                schedule = Schedule()
+                schedule.mode = mode
+                schedule.start = datetime.datetime.strptime(schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.rule = schedules[i][mode_setting]["vsRule"]["name"]
+
+                for j in range(2):
+                    stage_name = schedules[i][mode_setting]["vsStages"][j]["name"]
+                    stage_image = schedules[i][mode_setting]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
+
+                schedule_list.append(schedule)
+
+    elif mode in ("open", "challenge"):
         bankara_idx = {"challenge":0, "open":1}
         for i in range(repeat):
             schedule = Schedule()
-            schedule.mode = mode
-            schedule.start = datetime.datetime.strptime(schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
-            schedule.end = datetime.datetime.strptime(schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
 
-            # rule = schedules[i][mode_setting][bankara_idx[mode]]["vsRule"]["rule"]
-            schedule.rule = schedules[i][mode_setting][bankara_idx[mode]]["vsRule"]["name"]
+            if schedules[i]["festMatchSetting"]:
+                schedule.mode = "fest"
+                schedule.start = datetime.datetime.strptime(fest_schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(fest_schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.rule = fest_schedules[i]["festMatchSetting"]["vsRule"]["name"]
 
-            for j in range(2):
-                stage_name = schedules[i][mode_setting][bankara_idx[mode]]["vsStages"][j]["name"]
-                stage_image = schedules[i][mode_setting][bankara_idx[mode]]["vsStages"][j]["image"]["url"]
-                stage = BasicElement(stage_name, stage_image)
-                schedule.stages.append(stage)
+                for j in range(2):
+                    stage_name = fest_schedules[i]["festMatchSetting"]["vsStages"][j]["name"]
+                    stage_image = fest_schedules[i]["festMatchSetting"]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
+
+            else:
+                schedule.mode = mode
+                schedule.start = datetime.datetime.strptime(schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.rule = schedules[i][mode_setting][bankara_idx[mode]]["vsRule"]["name"]
+
+                for j in range(2):
+                    stage_name = schedules[i][mode_setting][bankara_idx[mode]]["vsStages"][j]["name"]
+                    stage_image = schedules[i][mode_setting][bankara_idx[mode]]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
 
             schedule_list.append(schedule)
     else:
         for i in range(repeat):
-            schedule = Schedule()
-            schedule.mode = mode
-            schedule.start = datetime.datetime.strptime(schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
-            schedule.end = datetime.datetime.strptime(schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
+            if schedules[i]["festMatchSetting"]:
+                schedule.mode = "fest"
+                schedule.start = datetime.datetime.strptime(fest_schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(fest_schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.rule = fest_schedules[i]["festMatchSetting"]["vsRule"]["name"]
 
-            if mode == 'regular':
-                schedule.rule = 'ナワバリ'
+                for j in range(2):
+                    stage_name = fest_schedules[i]["festMatchSetting"]["vsStages"][j]["name"]
+                    stage_image = fest_schedules[i]["festMatchSetting"]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
+
             else:
-                # rule = schedules[i][mode_setting]["vsRule"]["rule"]
-                schedule.rule = schedules[i][mode_setting]["vsRule"]["name"]
+                schedule = Schedule()
+                schedule.mode = mode
+                schedule.start = datetime.datetime.strptime(schedules[i]["startTime"], TIME_FORMAT) + UTC_TO_JST
+                schedule.end = datetime.datetime.strptime(schedules[i]["endTime"], TIME_FORMAT) + UTC_TO_JST
 
-            for j in range(2):
-                stage_name = schedules[i][mode_setting]["vsStages"][j]["name"]
-                stage_image = schedules[i][mode_setting]["vsStages"][j]["image"]["url"]
-                stage = BasicElement(stage_name, stage_image)
-                schedule.stages.append(stage)
+                if mode == 'regular':
+                    schedule.rule = 'ナワバリ'
+                else:
+                    # rule = schedules[i][mode_setting]["vsRule"]["rule"]
+                    schedule.rule = schedules[i][mode_setting]["vsRule"]["name"]
+
+                for j in range(2):
+                    stage_name = schedules[i][mode_setting]["vsStages"][j]["name"]
+                    stage_image = schedules[i][mode_setting]["vsStages"][j]["image"]["url"]
+                    stage = BasicElement(stage_name, stage_image)
+                    schedule.stages.append(stage)
 
             schedule_list.append(schedule)
 
@@ -523,12 +588,6 @@ def get_stages_by_rule_helper(data, rule, mode, mode_setting):
     return schedule_list
 
 
-
-
-
-
-
 # for test
 if __name__ == '__main__':
-
     sys.exit(0)
