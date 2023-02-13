@@ -19,6 +19,8 @@ available on mobile. It can provide real-time battle schedules, salmon run sched
 - X Match(Xマッチ): `/xmatch <number>`
 - League Match(リーグマッチ): `/league <number>`
   - Not implemented in game now
+- Fes Match(フェスマッチ): `/fes <number>`
+  - will also return tricolor stage(トリカラのステージ)
 
 `<number>` is a required argument which means the number of schedules it will return. The maximum of this value is `12`.
 <br><br>
