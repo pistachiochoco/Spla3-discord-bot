@@ -1,8 +1,8 @@
 {
     "session_token": "pasted session token here",
-    ""web_service_token": "automatically generated",
-    ""bullet_token": "automatically generated",
-    user_language": "ja-JP",
+    "web_service_token": "automatically generated",
+    "bullet_token": "automatically generated",
+    "user_language": "ja-JP",
     "web_view_version": "3.0.0-2857bc50",
     "nso_app_version": "2.5.0",
     "spla3_api_url": "https://api.lp1.av5ja.srv.nintendo.net"
