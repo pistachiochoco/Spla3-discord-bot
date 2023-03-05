@@ -449,7 +449,8 @@ def get_gear_helper(data, is_daily=False):
 def get_current_season():
     '''
     A helper function for fetching current season ID.
-    2020 Chill Season: WFJhbmtpbmdTZWFzb24tcDoy
+    2022 Chill Season: WFJhbmtpbmdTZWFzb24tcDoy
+    2023 Fresh Season: WFJhbmtpbmdTZWFzb24tcDoz
     '''
     load_tokens()
 
@@ -486,7 +487,7 @@ def get_x_ranking(rule="ALL", num=10):
     '''
     load_tokens()
 
-    current_season_id = "WFJhbmtpbmdTZWFzb24tcDoy"
+    current_season_id = "WFJhbmtpbmdTZWFzb24tcDoz"
     header, cookie, body = generate_graphql_request('XRankingDetailQuery')
     body["variables"]["id"] = current_season_id
     response = requests.post(SPLA3_API_GRAPHQL_URL, headers=header, cookies=cookie, json=body)
@@ -632,8 +633,4 @@ def get_stages_info():
 
 # for test
 if __name__ == '__main__':
-    print(get_current_season())
-    lst = get_stages('xmatch',repeat=12)
-    for l in lst:
-        print(l)
     sys.exit(0)
