@@ -82,6 +82,21 @@ class Player:
         return self.__str__()
 
 
+class Stage:
+    def __init__(self):
+        self.vsStageId = None
+        self.name = None
+        self.image = None
+        self.id = None
+
+    def __str__(self):
+        return f"{self.vsStageId:<3} {self.id:<12} {self.name}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+
 self_path = os.path.dirname(__file__)
 config_path = os.path.join(self_path, "config.txt")
 
@@ -100,7 +115,7 @@ NSO_APP_VERSION = config_data["nso_app_version"]
 USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
 
 QUERY_ID = {
-    "StageScheduleQuery": "730cd98e84f1030d3e9ac86b6f1aae13",
+    "StageScheduleQuery": "011e394c0e384d77a0701474c8c11a20",
     "GesotownQuery": "a43dd44899a09013bcfd29b4b13314ff",
     "XRankingQuery": "d771444f2584d938db8d10055599011d",
     "XRankingDetailQuery": "ec7174376203f9901713e116075c5ecd",
@@ -588,6 +603,37 @@ def get_stages_by_rule_helper(data, rule, mode, mode_setting):
     return schedule_list
 
 
+def get_stages_info():
+    schedules_data = load_data('schedules.json')
+
+    stages = []
+    seen = set()
+
+    for mode in ('regular', 'xmatch', 'regular'):
+        mode_schedules, mode_setting = get_stage_index_string(mode)
+        schedules = schedules_data["data"][mode_schedules]["nodes"]
+
+        for i in range(len(schedules)):
+            for j in range(2):
+                if schedules[i][mode_setting]["vsStages"][j]["name"] not in seen:
+                    seen.add(schedules[i][mode_setting]["vsStages"][j]["name"])
+                    stage = Stage()
+                    stage.name = schedules[i][mode_setting]["vsStages"][j]["name"]
+                    stage.image = schedules[i][mode_setting]["vsStages"][j]["image"]["url"]
+                    stage.vsStageId = schedules[i][mode_setting]["vsStages"][j]["vsStageId"]
+                    stage.id = schedules[i][mode_setting]["vsStages"][j]["id"]
+                    stages.append(stage)
+
+    stages.sort(key=lambda stage:stage.vsStageId)
+    for stage in stages:
+        print(stage)
+
+
+
 # for test
 if __name__ == '__main__':
+    print(get_current_season())
+    lst = get_stages('xmatch',repeat=12)
+    for l in lst:
+        print(l)
     sys.exit(0)

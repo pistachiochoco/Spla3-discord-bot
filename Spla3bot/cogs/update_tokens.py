@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 utc = datetime.timezone.utc
-times = [datetime.time(hour=i, tzinfo=utc) for i in range(0, 24, 2)]
+times = [datetime.time(hour=i, minute=1, tzinfo=utc) for i in range(0, 24, 1)]
 times_gear = [datetime.time(hour=i, minute=1, tzinfo=utc) for i in range(0, 24, 4)]
 
 class UpdateTokens(commands.Cog):
@@ -29,8 +29,10 @@ class UpdateTokens(commands.Cog):
         generate_tokens()
         if validate_tokens() is False:
             logger.error("Tokens are invalid.")
+            print("Tokens are invalid.")
         save_data("schedules.json")
         save_data("gesotown.json")
+        print("data updated")
 
     # @tasks.loop(time=times_gear)
     # async def save_gesotown(self):
@@ -42,6 +44,12 @@ class UpdateTokens(commands.Cog):
         logger.info("Tokens are generated.")
         save_data("schedules.json")
         save_data("gesotown.json")
+
+
+
+class UpdateManually(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command()
     async def update_data(
@@ -57,5 +65,7 @@ class UpdateTokens(commands.Cog):
         await ctx.send("Manually updated data.")
 
 
+
 async def setup(bot):
     await bot.add_cog(UpdateTokens(bot))
+    await bot.add_cog(UpdateManually(bot))

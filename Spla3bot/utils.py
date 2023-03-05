@@ -37,6 +37,7 @@ def load_web_image(url):
     '''Fetches web image by GET request and returns it in pillow-format.'''
     response = requests.get(url, stream=True)
     image = Image.open(io.BytesIO(response.content))
+    # ステレスジャンプのギアパワーの画像だけはモノクロなのでRGBに変更
     if image.mode == "LA":
         image = image.convert("RGBA")
     background = Image.new("RGBA", image.size, BACKGROUND_COLOR)

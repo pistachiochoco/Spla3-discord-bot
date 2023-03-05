@@ -52,7 +52,7 @@ def get_web_view_ver(gtoken=""):
     Fetches the web view version and sets it globally.
     Manually update when new version is released for now.
     '''
-    return "2.0.0-bd36a652"
+    return "3.0.0-2857bc50"
 
 
 def f_api(id_token, hash_method):
